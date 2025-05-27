@@ -136,6 +136,7 @@
         </div>
 
         <script>
+            const API_BASE = 'https://entre-lineas-d77c.onrender.com';
             document.addEventListener('DOMContentLoaded', function () {
                 const form = document.getElementById('edit-form');
                 const nombre = document.getElementById('nombre');
@@ -185,7 +186,7 @@
 
                     const token = session.token;
 
-                    fetch(`http://localhost:5000/usuarios/${userId}`, {
+                    fetch(`${API_BASE}/usuarios/${userId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
