@@ -145,6 +145,7 @@
 
     <!-- Script de funcionalidad -->
     <script>
+        const API_BASE = 'https://entre-lineas-d77c.onrender.com';
         // Verificar si ya hay una sesión activa
         window.addEventListener('DOMContentLoaded', function () {
             const userSession = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
@@ -196,7 +197,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:5000/login', {
+                const response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
