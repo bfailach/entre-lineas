@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entre Lineas - Historial de Pedidos</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Cabecera superior con enlaces informativos y sociales -->
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a>
+            <span>|</span>
+            <a href="Ayuda.html">Ayuda</a>
+            <span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <!-- Sección del logo y barra de búsqueda -->
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html">
+                <img src="Img/carrito-de-compras.webp" alt="Carrito de compras" width="24" height="24">
+            </a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <!-- Historial de Pedidos -->
+    <div class="history-container">
+        <h2>Historial de pedidos</h2>
+
+        <div class="order-history">
+            <!-- Pedido 1 -->
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <p class="order-number">Pedido #10045</p>
+                        <p class="order-date">15 de mayo de 2023</p>
+                    </div>
+                    <div class="order-status delivered">
+                        <span>Entregado</span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <div class="order-item">
+                        <img src="Img/anatomia.webp" alt="Anatomía del Mal">
+                        <div class="item-details">
+                            <h4>Anatomía del Mal</h4>
+                            <p>Jordi Wild</p>
+                            <p class="item-price">$65.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 1</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item">
+                        <img src="Img/habitos.webp" alt="Hábitos Atómicos">
+                        <div class="item-details">
+                            <h4>Hábitos Atómicos</h4>
+                            <p>James Clear</p>
+                            <p class="item-price">$58.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        <p>Total: <span>$123.000</span></p>
+                    </div>
+                    <button class="order-details-btn">Ver detalles</button>
+                </div>
+            </div>
+
+            <!-- Pedido 2 -->
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <p class="order-number">Pedido #9876</p>
+                        <p class="order-date">3 de abril de 2023</p>
+                    </div>
+                    <div class="order-status delivered">
+                        <span>Entregado</span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <div class="order-item">
+                        <img src="Img/hp-piedra.webp" alt="Harry Potter y la piedra filosofal">
+                        <div class="item-details">
+                            <h4>Harry Potter y la piedra filosofal</h4>
+                            <p>J.K. Rowling</p>
+                            <p class="item-price">$42.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        <p>Total: <span>$42.000</span></p>
+                    </div>
+                    <button class="order-details-btn">Ver detalles</button>
+                </div>
+            </div>
+
+            <!-- Pedido 3 -->
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <p class="order-number">Pedido #9542</p>
+                        <p class="order-date">18 de febrero de 2023</p>
+                    </div>
+                    <div class="order-status delivered">
+                        <span>Entregado</span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <div class="order-item">
+                        <img src="Img/a-traves.webp" alt="A través de mi ventana">
+                        <div class="item-details">
+                            <h4>A través de mi ventana</h4>
+                            <p>Ariana Godoy</p>
+                            <p class="item-price">$48.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 1</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item">
+                        <img src="Img/stranger.webp" alt="The Stranger">
+                        <div class="item-details">
+                            <h4>The Stranger</h4>
+                            <p>Albert Camus</p>
+                            <p class="item-price">$39.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 1</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item">
+                        <img src="Img/culpa-mia.webp" alt="Culpa mía">
+                        <div class="item-details">
+                            <h4>Culpa Mía</h4>
+                            <p>Mercedes Ron</p>
+                            <p class="item-price">$45.000</p>
+                        </div>
+                        <div class="item-quantity">
+                            <span>Cantidad: 2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        <p>Total: <span>$177.000</span></p>
+                    </div>
+                    <button class="order-details-btn">Ver detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Non-functional button click events
+        document.addEventListener('DOMContentLoaded', function () {
+            const detailButtons = document.querySelectorAll('.order-details-btn');
+
+            detailButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    alert('Funcionalidad en desarrollo. Esta página es solo una demostración visual.');
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

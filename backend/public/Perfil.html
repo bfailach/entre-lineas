@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entre Lineas - Perfil</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet">
+    <style>
+        .perfil-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .perfil-container img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .perfil-container p {
+            margin: 0.5rem 0;
+        }
+
+        .botones-perfil button {
+            margin: 0.5rem;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .botones-perfil button:hover {
+            background-color: #0056b3;
+        }
+
+        .mensaje-sesion {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .mensaje-sesion a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #CC9600, #9f652f);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a><span>|</span>
+            <a href="Ayuda.html">Ayuda</a><span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html"><img src="Img/carrito-de-compras.webp" alt="Carrito" width="24" height="24"></a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <div class="perfil-container" id="perfil-container">
+        <!-- Contenido dinámico desde JS -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('perfil-container');
+            const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+
+            if (!sessionData) {
+                container.innerHTML = `
+                    <div class="mensaje-sesion">
+                        <h2>Debes iniciar sesión para acceder a tu perfil.</h2>
+                        <a href="Login.html">Ir a iniciar sesión</a>
+                    </div>`;
+                return;
+            }
+
+            let user = null;
+            try {
+                const parsed = JSON.parse(sessionData);
+                user = parsed.user;
+            } catch (e) {
+                console.error('Error de sesión:', e);
+            }
+
+            if (!user) {
+                container.innerHTML = `
+                    <div class="mensaje-sesion">
+                        <h2>No se pudo cargar tu información de sesión.</h2>
+                        <a href="Login.html">Volver a iniciar sesión</a>
+                    </div>`;
+                return;
+            }
+
+            const profileImage = localStorage.getItem('profileImage') || 'Img/default-profile.png';
+
+            container.innerHTML = `
+                <div class="profile-picture-container">
+                    <div class="profile-picture">
+                        <img id="profile-img" src="${profileImage}" alt="Foto de perfil">
+                    </div>
+                </div>
+
+                <div class="info-contacto">
+                    <p><strong>Nombre:</strong> <span>${user.nombre || ''}</span></p>
+                    <p><strong>Email:</strong> <span>${user.email || ''}</span></p>
+                    <p><strong>Teléfono:</strong> <span>${user.telefono || 'Sin especificar'}</span></p>
+                    <p><strong>Dirección:</strong> <span>${user.direccion || 'Sin especificar'}</span></p>
+                </div>
+
+                <div class="botones-perfil">
+                    <button onclick="location.href='Editar_perfil.html'">Editar perfil</button>
+                    <button onclick="location.href='Historial.html'">Historial de pedidos</button>
+                </div>
+            `;
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

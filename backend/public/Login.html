@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entre Líneas - Iniciar Sesión</title>
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet" />
+
+    <style>
+        /* Estilos adicionales para mensajes y spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+            display: block;
+        }
+
+        .success-message {
+            background-color: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+            display: block;
+        }
+
+        .login-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cabecera superior con enlaces -->
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a>
+            <span>|</span>
+            <a href="Ayuda.html">Ayuda</a>
+            <span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <!-- Logo y barra de búsqueda -->
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html">
+                <img src="Img/carrito-de-compras.webp" alt="Carrito de compras" width="24" height="24" />
+            </a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <!-- Sección de login -->
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="Img/entre-lineas.webp" alt="Logo" />
+        </div>
+
+        <form class="login-form" id="login-form">
+            <h2 class="login-title">Iniciar sesión</h2>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Correo electrónico</label>
+                <input class="form-input" type="email" id="email" name="email" autocomplete="email"
+                    placeholder="Ingresa tu correo electrónico" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Contraseña</label>
+                <input class="form-input" type="password" id="password" name="password" autocomplete="current-password"
+                    placeholder="Ingresa tu contraseña" required />
+            </div>
+
+            <label class="remember-me">
+                <input type="checkbox" id="recordar" />
+                Recordarme
+            </label>
+
+            <button type="submit" class="login-btn">Iniciar sesión</button>
+
+            <!-- Mensaje dinámico -->
+            <div id="login-message" class="login-message"></div>
+
+            <div class="login-links">
+                <a href="#" class="login-link">¿Olvidaste tu contraseña?</a>
+                <a href="Registro.html" class="login-link">¿No tienes cuenta? Regístrate</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Script de funcionalidad -->
+    <script>
+        // Verificar si ya hay una sesión activa
+        window.addEventListener('DOMContentLoaded', function () {
+            const userSession = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+            if (userSession) {
+                try {
+                    const session = JSON.parse(userSession);
+                    if (session.token) {
+                        // Verificar si el token sigue siendo válido
+                        verifyToken(session.token).then(valid => {
+                            if (valid) {
+                                window.location.href = 'SesionIniciada.html';
+                            } else {
+                                // Limpiar sesión inválida
+                                localStorage.removeItem('userSession');
+                                sessionStorage.removeItem('userSession');
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error al verificar sesión:', error);
+                }
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner"></span> Iniciando sesión...';
+
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value.trim(),
+            };
+
+            // Validaciones del frontend
+            if (!formData.email || !formData.password) {
+                showError("Por favor, completa todos los campos.");
+                resetButton(submitButton, originalText);
+                return;
+            }
+
+            if (!isValidEmail(formData.email)) {
+                showError("Por favor, ingresa un email válido.");
+                resetButton(submitButton, originalText);
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al iniciar sesión');
+                }
+
+                showSuccess("¡Inicio de sesión exitoso!");
+
+                // Guardar sesión según preferencia del usuario
+                const storage = document.getElementById('recordar').checked ? localStorage : sessionStorage;
+                storage.setItem('userSession', JSON.stringify({
+                    token: data.token,
+                    user: data.user,
+                    loginTime: new Date().toISOString()
+                }));
+
+                // Redirigir después de un breve delay
+                setTimeout(() => {
+                    window.location.href = 'Index.html'; // Cambia a dashboard.html si tienes esa página
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error de login:', error);
+
+                // Mostrar mensaje de error específico
+                if (error.message.includes('fetch')) {
+                    showError("No se pudo conectar al servidor. Verifica que el backend esté corriendo.");
+                } else {
+                    showError(error.message);
+                }
+
+                resetButton(submitButton, originalText);
+            }
+        });
+
+        // Función para verificar token
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('http://localhost:5000/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function resetButton(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showError(message) {
+            const messageBox = document.getElementById('login-message');
+            messageBox.textContent = message;
+            messageBox.className = 'login-message error-message';
+        }
+
+        function showSuccess(message) {
+            const messageBox = document.getElementById('login-message');
+            messageBox.textContent = message;
+            messageBox.className = 'login-message success-message';
+        }
+
+        // Función para crear usuario de prueba (solo para desarrollo)
+        async function createTestUser() {
+            try {
+                const testUser = {
+                    nombre: "Usuario de Prueba",
+                    email: "test@entrelineas.com",
+                    password: "123456",
+                    telefono: "1234567890",
+                    direccion: "Dirección de prueba"
+                };
+
+                const response = await fetch('http://localhost:5000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testUser),
+                });
+
+                const data = await response.json();
+                console.log('Usuario de prueba creado:', data);
+            } catch (error) {
+                console.log('El usuario de prueba ya existe o hubo un error:', error.message);
+            }
+        }
+
+        // Crear usuario de prueba en desarrollo (comentar en producción)
+        // createTestUser();
+    </script>
+
+    <!-- Tawk.to chat -->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/6807bd7b9da1ea190e653e9a/1ipf3ob4n';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

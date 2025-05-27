@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entre Lineas - Editar Perfil</title>
+    <link rel="stylesheet" href="style.css"> <!-- Tu archivo de estilos personalizado -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Cabecera superior con enlaces informativos y sociales -->
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a>
+            <span>|</span>
+            <a href="Ayuda.html">Ayuda</a>
+            <span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+    <!-- Sección del logo y barra de búsqueda -->
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Menú de navegación -->
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html">
+                <img src="Img/carrito-de-compras.webp" alt="Carrito de compras" width="24" height="24">
+            </a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <!DOCTYPE html>
+    <html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Editar Perfil - Entre Líneas</title>
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <style>
+            .edit-container {
+                max-width: 600px;
+                margin: 3rem auto;
+                padding: 2rem;
+                background-color: #f9f9f9;
+                border-radius: 10px;
+            }
+
+            .edit-container h2 {
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-group label {
+                display: block;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 0.5rem;
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 0.6rem 1.2rem;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="edit-container">
+            <h2>Editar Perfil</h2>
+            <form id="edit-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" id="telefono">
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion">
+                </div>
+                <div class="form-group">
+                    <label for="imagen">Foto de perfil</label>
+                    <input type="file" id="imagen" accept="image/*">
+                </div>
+                <button type="submit" class="btn">Guardar cambios</button>
+            </form>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('edit-form');
+                const nombre = document.getElementById('nombre');
+                const email = document.getElementById('email');
+                const telefono = document.getElementById('telefono');
+                const direccion = document.getElementById('direccion');
+                const imagen = document.getElementById('imagen');
+
+                // Cargar datos existentes
+                const session = JSON.parse(localStorage.getItem('userSession') || sessionStorage.getItem('userSession') || '{}');
+                const user = session.user || {};
+                const userId = user.id;
+
+                if (!userId) {
+                    alert('Debes iniciar sesión para editar tu perfil.');
+                    window.location.href = 'Login.html';
+                    return;
+                }
+
+                nombre.value = user.nombre || '';
+                email.value = user.email || '';
+                telefono.value = user.telefono || '';
+                direccion.value = user.direccion || '';
+
+                let currentProfileImage = localStorage.getItem('profileImage') || '';
+
+                imagen.addEventListener('change', function () {
+                    const file = imagen.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            currentProfileImage = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const newUserData = {
+                        nombre: nombre.value.trim(),
+                        email: email.value.trim(),
+                        telefono: telefono.value.trim(),
+                        direccion: direccion.value.trim()
+                    };
+
+                    const token = session.token;
+
+                    fetch(`http://localhost:5000/usuarios/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(newUserData)
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.error) throw new Error(data.error);
+
+                            // Actualizar almacenamiento
+                            const updatedSession = {
+                                ...session,
+                                user: { ...session.user, ...newUserData }
+                            };
+                            localStorage.setItem('userSession', JSON.stringify(updatedSession));
+                            sessionStorage.setItem('userSession', JSON.stringify(updatedSession));
+
+                            if (currentProfileImage && !currentProfileImage.includes('default-profile.png')) {
+                                localStorage.setItem('profileImage', currentProfileImage);
+                            }
+
+                            alert('Perfil actualizado correctamente');
+                            window.location.href = 'Perfil.html?updated=true';
+                        })
+                        .catch(err => {
+                            console.error('Error al actualizar perfil:', err);
+                            alert('Error al actualizar el perfil: ' + err.message);
+                        });
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('search-form');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const input = document.getElementById('busqueda');
+                        const query = input.value.trim();
+                        if (query) {
+                            window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                        }
+                    });
+                }
+            });
+        </script>
+
+    </body>
+
+    </html>

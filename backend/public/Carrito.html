@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entre Líneas - Carrito</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet" />
+    <style>
+        .cart-section {
+            padding: 2rem;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .cart-item img {
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .cart-item div {
+            flex: 1;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .quantity-controls button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background-color: #ddd;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .cart-summary {
+            border-top: 1px solid #ccc;
+            padding-top: 1.5rem;
+        }
+
+        .cart-summary p {
+            margin: 0.5rem 0;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            margin-right: 0.5rem;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<!-- SDK de Mercado Pago -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+<script>
+  const mp = new MercadoPago('APP_USR-cbfdc672-3c44-4846-8744-2a189e24e42d');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnPagar = document.getElementById('btn-finalizar');
+
+    if (btnPagar) {
+      btnPagar.addEventListener('click', async () => {
+        const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+        if (!sessionData) return alert('Debes iniciar sesión');
+
+        const session = JSON.parse(sessionData);
+        const usuario_id = session.user?.id;
+
+        try {
+          const res = await fetch('/crear-preferencia', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario_id })
+          });
+
+          const data = await res.json();
+
+          if (!data.id) throw new Error('Preferencia no generada');
+          mp.checkout({ preference: { id: data.id }, autoOpen: true });
+
+        } catch (err) {
+          console.error('Error al iniciar pago:', err);
+          alert('No se pudo iniciar el pago');
+        }
+      });
+    }
+  });
+</script>
+
+<body>
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a><span>|</span>
+            <a href="Ayuda.html">Ayuda</a><span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html"><img src="Img/carrito-de-compras.webp" alt="Carrito" width="24" height="24" /></a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <section class="cart-section">
+        <h2>Tu Carrito</h2>
+        <div id="cart-empty" style="display: none;">
+            <p>Tu carrito está vacío.</p>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+
+        <div class="cart-summary">
+            <h3>Resumen</h3>
+            <p><strong>Productos:</strong> <span id="total-items">0</span></p>
+            <p><strong>Envío:</strong> <span id="shipping-cost">$0.00</span></p>
+            <p><strong>Total:</strong> <span id="total-price">$0.00</span></p>
+            <button class="btn btn-secondary" onclick="vaciarCarrito()">Vaciar Carrito</button>
+            <button class="btn btn-primary">Finalizar Compra</button>
+        </div>
+    </section>
+
+    <script>
+        let usuarioId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    usuarioId = session.user?.id;
+                } catch (e) {
+                    console.error('Sesión inválida:', e);
+                }
+            }
+
+            if (!usuarioId) {
+                document.querySelector('.cart-section').innerHTML = '<p>Debes iniciar sesión para ver el carrito.</p>';
+                return;
+            }
+
+            await cargarCarrito();
+        });
+
+        async function cargarCarrito() {
+            try {
+                const res = await fetch(`/carrito/${usuarioId}`);
+                const items = await res.json();
+
+                const cartItems = document.getElementById('cart-items');
+                const cartEmpty = document.getElementById('cart-empty');
+                const totalItems = document.getElementById('total-items');
+                const totalPrice = document.getElementById('total-price');
+                const shippingCost = document.getElementById('shipping-cost');
+
+                if (items.length === 0) {
+                    cartEmpty.style.display = 'block';
+                    cartItems.innerHTML = '';
+                    totalItems.textContent = '0';
+                    totalPrice.textContent = '$0.00';
+                    return;
+                }
+
+                cartEmpty.style.display = 'none';
+                cartItems.innerHTML = '';
+                let total = 0;
+                let count = 0;
+
+                items.forEach(item => {
+                    const subtotal = parseFloat(item.precio) * item.cantidad;
+                    total += subtotal;
+                    count += item.cantidad;
+
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+            <img src="${item.imagen}" alt="${item.titulo}" width="60">
+            <div>
+              <h4>${item.titulo}</h4>
+              <p>${item.autor}</p>
+              <p>Precio unitario: $${parseFloat(item.precio).toFixed(2)}</p>
+              <div class="quantity-controls">
+                <button onclick="actualizarCantidad(${item.id}, ${item.cantidad - 1})">-</button>
+                <span>${item.cantidad}</span>
+                <button onclick="actualizarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
+              </div>
+              <p>Subtotal: $${subtotal.toFixed(2)}</p>
+              <button class="btn btn-danger" onclick="eliminarDelCarrito(${item.id})">Eliminar</button>
+            </div>
+          `;
+                    cartItems.appendChild(div);
+                });
+
+                totalItems.textContent = count;
+                shippingCost.textContent = '$0.00';
+                totalPrice.textContent = `$${total.toFixed(2)}`;
+            } catch (err) {
+                console.error('Error al cargar carrito:', err);
+                document.getElementById('cart-items').innerHTML = '<p>Error al cargar el carrito.</p>';
+            }
+        }
+
+        async function eliminarDelCarrito(id) {
+            try {
+                const res = await fetch(`/carrito/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                alert(data.message);
+                await cargarCarrito();
+            } catch (err) {
+                console.error('Error al eliminar del carrito:', err);
+                alert('No se pudo eliminar el libro.');
+            }
+        }
+
+        async function actualizarCantidad(id, nuevaCantidad) {
+            if (nuevaCantidad < 1) return eliminarDelCarrito(id);
+
+            try {
+                const res = await fetch(`/carrito/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cantidad: nuevaCantidad })
+                });
+                if (!res.ok) throw new Error('Error al actualizar cantidad');
+                await cargarCarrito();
+            } catch (err) {
+                console.error('Error al actualizar cantidad:', err);
+                alert('No se pudo actualizar la cantidad.');
+            }
+        }
+
+        async function vaciarCarrito() {
+            if (!confirm("¿Estás seguro de que quieres vaciar el carrito?")) return;
+
+            try {
+                const res = await fetch(`/carrito/usuario/${usuarioId}`, { method: 'DELETE' });
+                const data = await res.json();
+                alert(data.message);
+                await cargarCarrito();
+            } catch (err) {
+                console.error('Error al vaciar carrito:', err);
+                alert('No se pudo vaciar el carrito.');
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

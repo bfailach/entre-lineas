@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entre Líneas - Detalle del Libro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Cabecera superior -->
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a><span>|</span>
+            <a href="Ayuda.html">Ayuda</a><span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <!-- Logo y barra de búsqueda -->
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navegación -->
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html"><img src="Img/carrito-de-compras.webp" alt="Carrito" width="24" height="24" /></a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <!-- Contenido del libro -->
+    <div class="container">
+        <h1 id="titulo-libro">Cargando...</h1>
+
+        <div class="fila-detalle">
+            <div class="cuadro-imagen">
+                <img id="imagen-libro" src="" alt="Portada del libro">
+            </div>
+            <div class="cuadro-info">
+                <p><strong>Autor:</strong> <span id="autor-libro"></span></p>
+                <p><strong>Categoría:</strong> <span id="categoria-libro"></span></p>
+                <p><strong>Precio:</strong> $<span id="precio-libro"></span></p>
+                <p><strong>Stock disponible:</strong> <span id="stock-libro"></span></p>
+                <p><strong>Descripción:</strong></p>
+                <p id="descripcion-libro"></p>
+            </div>
+        </div>
+
+        <div class="boton-volver-container">
+            <button class="btn-volver" onclick="history.back()">Volver</button>
+        </div>
+    </div>
+
+    <!-- Script para cargar los datos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!id) {
+                document.getElementById('titulo-libro').textContent = 'ID de libro no especificado';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/libros/${id}`);
+                if (!res.ok) throw new Error('Libro no encontrado');
+                const libro = await res.json();
+
+                document.getElementById('titulo-libro').textContent = libro.titulo;
+                document.getElementById('imagen-libro').src = libro.imagen;
+                document.getElementById('imagen-libro').alt = libro.titulo;
+                document.getElementById('autor-libro').textContent = libro.autor;
+                document.getElementById('precio-libro').textContent = parseFloat(libro.precio).toFixed(2);
+                document.getElementById('stock-libro').textContent = libro.stock;
+                document.getElementById('categoria-libro').textContent = libro.categoria || 'Sin categoría';
+                document.getElementById('descripcion-libro').textContent = libro.descripcion || 'Sin descripción disponible.';
+            } catch (err) {
+                console.error(err);
+                document.querySelector('.container').innerHTML = `<p>Error al cargar los detalles del libro.</p>`;
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

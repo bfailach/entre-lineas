@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entre Líneas - Gestión de Libros</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body>
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a><span>|</span>
+            <a href="Ayuda.html">Ayuda</a><span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html"><img src="Img/carrito-de-compras.webp" alt="Carrito" width="24" height="24" /></a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <div class="management-container">
+        <h2>Gestión de libros</h2>
+
+        <button id="add-book-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo libro</button>
+
+        <div class="table-responsive">
+            <table id="books-table" class="management-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Portada</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar libros -->
+    <div id="book-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modal-title">Agregar libro</h3>
+            <form id="book-form">
+                <input type="hidden" id="book-id" />
+
+                <label for="title">Título</label>
+                <input type="text" id="title" required />
+
+                <label for="author">Autor</label>
+                <input type="text" id="author" required />
+
+                <label for="description">Descripción</label>
+                <textarea id="description" rows="3"></textarea>
+
+                <label for="price">Precio</label>
+                <input type="number" id="price" step="0.01" required />
+
+                <label for="stock">Stock</label>
+                <input type="number" id="stock" required />
+
+                <label for="category">Categoría</label>
+                <select id="category" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="ficción">Ficción</option>
+                    <option value="filosofía">Filosofía</option>
+                    <option value="autoayuda">Autoayuda</option>
+                    <option value="romance">Romance</option>
+                    <option value="fantasía">Fantasía</option>
+                    <option value="otros">Otros</option>
+                </select>
+
+                <label for="image">URL de la imagen</label>
+                <input type="text" id="image" required />
+
+                <button type="submit" class="btn btn-submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content confirm-modal">
+            <p>¿Estás seguro de que deseas eliminar este libro?</p>
+            <div class="confirm-buttons">
+                <button id="confirm-delete" class="btn btn-danger">Eliminar</button>
+                <button id="cancel-delete" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content detail-modal">
+            <span class="close-modal">&times;</span>
+            <div class="detail-container">
+                <div class="detail-image">
+                    <img id="detail-img" src="" alt="Portada del libro" />
+                </div>
+                <div class="detail-info">
+                    <h3 id="detail-title"></h3>
+                    <p id="detail-author"></p>
+                    <p id="detail-description"></p>
+                    <p><strong>Precio:</strong> $<span id="detail-price"></span></p>
+                    <p><strong>Stock:</strong> <span id="detail-stock"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="reportes-soporte" class="reportes-container">
+        <h3>Reportes de soporte</h3>
+        <div id="lista-reportes"></div>
+    </section>
+    <script>
+        let books = [];
+        let currentBookId = null;
+
+        const addBookBtn = document.getElementById('add-book-btn');
+        const bookModal = document.getElementById('book-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const detailModal = document.getElementById('detail-modal');
+        const bookForm = document.getElementById('book-form');
+        const booksTable = document.querySelector('#books-table tbody');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBooks();
+
+            addBookBtn.onclick = () => openBookModal();
+
+            closeModalButtons.forEach(btn => {
+                btn.onclick = closeAllModals;
+            });
+
+            cancelDeleteBtn.onclick = closeAllModals;
+
+            confirmDeleteBtn.onclick = deleteBook;
+
+            bookForm.onsubmit = handleFormSubmit;
+
+            window.onclick = (e) => {
+                if ([bookModal, confirmModal, detailModal].includes(e.target)) {
+                    closeAllModals();
+                }
+            };
+        });
+
+        function openBookModal(book = null) {
+            const title = document.getElementById('modal-title');
+            bookForm.reset();
+            document.getElementById('book-id').value = '';
+
+            if (book) {
+                title.textContent = 'Editar libro';
+                document.getElementById('book-id').value = book.id;
+                document.getElementById('title').value = book.titulo;
+                document.getElementById('author').value = book.autor;
+                document.getElementById('description').value = book.descripcion || '';
+                document.getElementById('price').value = book.precio;
+                document.getElementById('stock').value = book.stock;
+                document.getElementById('image').value = book.imagen;
+                document.getElementById('category').value = book.categoria || 'otros';
+            } else {
+                title.textContent = 'Agregar libro';
+            }
+
+            bookModal.style.display = 'block';
+        }
+
+        function closeAllModals() {
+            bookModal.style.display = 'none';
+            confirmModal.style.display = 'none';
+            detailModal.style.display = 'none';
+        }
+
+        async function loadBooks() {
+            try {
+                const res = await fetch('/libros');
+                books = await res.json();
+                renderBooksTable();
+            } catch (err) {
+                alert('Error al cargar libros');
+                console.error(err);
+            }
+        }
+
+        function renderBooksTable() {
+            booksTable.innerHTML = '';
+            books.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+          <td>${book.id}</td>
+          <td><img src="${book.imagen}" class="book-thumbnail" alt="${book.titulo}"></td>
+          <td>${book.titulo}</td>
+          <td>${book.autor}</td>
+          <td>
+            <button class="btn btn-view" data-id="${book.id}"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-edit" data-id="${book.id}"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-delete" data-id="${book.id}"><i class="fas fa-trash"></i></button>
+          </td>
+        `;
+                booksTable.appendChild(row);
+            });
+
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.onclick = (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const book = books.find(b => b.id == id);
+                    showDetails(book);
+                };
+            });
+
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.onclick = (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const book = books.find(b => b.id == id);
+                    openBookModal(book);
+                };
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.onclick = (e) => {
+                    currentBookId = e.currentTarget.dataset.id;
+                    confirmModal.style.display = 'block';
+                };
+            });
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const formData = {
+                titulo: document.getElementById('title').value.trim(),
+                autor: document.getElementById('author').value.trim(),
+                descripcion: document.getElementById('description').value.trim(),
+                precio: parseFloat(document.getElementById('price').value),
+                stock: parseInt(document.getElementById('stock').value),
+                categoria: document.getElementById('category').value.trim(),
+                imagen: document.getElementById('image').value.trim()
+            };
+
+            const id = document.getElementById('book-id').value;
+            const url = id ? `/libros/${id}` : '/libros';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Error en el servidor');
+                }
+
+                alert(id ? 'Libro actualizado' : 'Libro agregado');
+                closeAllModals();
+                loadBooks();
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            }
+        }
+
+        async function deleteBook() {
+            try {
+                const res = await fetch(`/libros/${currentBookId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) throw new Error('Error al eliminar libro');
+
+                alert('Libro eliminado');
+                confirmModal.style.display = 'none';
+                loadBooks();
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            }
+        }
+
+        function showDetails(book) {
+            document.getElementById('detail-title').textContent = book.titulo;
+            document.getElementById('detail-author').textContent = `Autor: ${book.autor}`;
+            document.getElementById('detail-description').textContent = book.descripcion || 'Sin descripción.';
+            document.getElementById('detail-price').textContent = book.precio;
+            document.getElementById('detail-stock').textContent = book.stock;
+            document.getElementById('detail-img').src = book.imagen;
+            detailModal.style.display = 'block';
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const contenedor = document.getElementById('lista-reportes');
+            if (!contenedor) return;
+
+            try {
+                const res = await fetch('/soporte');
+                const reportes = await res.json();
+
+                if (reportes.length === 0) {
+                    contenedor.innerHTML = '<p>No hay reportes aún.</p>';
+                    return;
+                }
+
+                contenedor.innerHTML = '';
+                reportes.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = 'reporte-item';
+                    div.innerHTML = `
+        <p><strong>Nombre:</strong> ${r.nombre}</p>
+        <p><strong>Email:</strong> ${r.email}</p>
+        <p><strong>Asunto:</strong> ${r.asunto}</p>
+        <p><strong>Mensaje:</strong> ${r.mensaje}</p>
+        <p><em>${new Date(r.fecha).toLocaleString()}</em></p>
+        <hr/>
+      `;
+                    contenedor.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error al cargar reportes:', err);
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>

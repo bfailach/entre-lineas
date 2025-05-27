@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soporte - Entre Líneas</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .soporte-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .soporte-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #007bff;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+
+<body>
+    <!-- Cabecera superior con enlaces informativos y sociales -->
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a>
+            <span>|</span>
+            <a href="Ayuda.html">Ayuda</a>
+            <span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <!-- Sección del logo y barra de búsqueda -->
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Menú de navegación -->
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html">
+                <img src="Img/carrito-de-compras.webp" alt="Carrito de compras" width="24" height="24">
+            </a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+  <section class="soporte-container">
+    <h2>Centro de soporte</h2>
+    <form id="soporte-form">
+      <div class="form-group">
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-group">
+        <label for="asunto">Asunto</label>
+        <input type="text" id="asunto" required />
+      </div>
+      <div class="form-group">
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn">Enviar reporte</button>
+      <div id="respuesta" class="message"></div>
+    </form>
+  </section>
+
+  <script>
+    document.getElementById('soporte-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const asunto = document.getElementById('asunto').value.trim();
+      const mensaje = document.getElementById('mensaje').value.trim();
+      const respuesta = document.getElementById('respuesta');
+
+      try {
+        const res = await fetch('/reportes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, email, asunto, mensaje })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Error al enviar reporte');
+
+        respuesta.textContent = 'Reporte enviado correctamente';
+        respuesta.className = 'message success';
+        respuesta.style.display = 'block';
+        e.target.reset();
+      } catch (err) {
+        console.error('Error:', err);
+        respuesta.textContent = 'Error al enviar el reporte. Intenta de nuevo.';
+        respuesta.className = 'message error';
+        respuesta.style.display = 'block';
+      }
+    });
+  </script>
+
+  <script>
+    // Función para búsqueda desde la barra
+    document.getElementById('search-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const query = document.getElementById('busqueda').value.trim();
+      if (query) {
+        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+      }
+    });
+  </script>
+</body>
+
+</html>

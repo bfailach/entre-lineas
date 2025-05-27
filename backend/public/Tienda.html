@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entre Líneas - Tienda</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <header class="top-header">
+        <div class="top-links">
+            <a href="Preguntas.html">Preguntas Frecuentes</a><span>|</span>
+            <a href="Ayuda.html">Ayuda</a><span>|</span>
+            <a href="Soporte.html">Soporte</a>
+        </div>
+    </header>
+
+    <div class="search-section">
+        <div class="logo">
+            <h1>ENTRE <span>LINEAS</span></h1>
+        </div>
+        <div class="search-bar">
+            <!-- FALTA: id="search-form" -->
+            <form id="search-form">
+                <input type="text" name="busqueda" id="busqueda" placeholder="¿Qué estás buscando hoy?">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a href="Index.html">Home</a>
+        <a href="SobreNosotros.html">Sobre Nosotros</a>
+        <a href="Tienda.html">Tienda</a>
+        <a href="Domicilios.html">Domicilios</a>
+        <a href="Gestion_de_libros.html">Gestión de libros</a>
+        <div class="auth-links">
+            <a href="carrito.html"><img src="Img/carrito-de-compras.webp" alt="Carrito" width="24" height="24" /></a>
+            <a href="Login.html">Iniciar Sesión</a>
+            <a href="Registro.html">Registrarse</a>
+            <a href="Perfil.html">Perfil</a>
+        </div>
+    </nav>
+
+    <section class="products">
+        <h2 class="section-title">Catálogo</h2>
+
+        <!-- Barra de búsqueda personalizada -->
+        <div class="search-bar-custom" style="text-align: center; margin: 1rem 0;">
+            <input type="text" id="custom-search" placeholder="Buscar por título o autor..."
+                style="padding: 8px; width: 250px;">
+            <button id="custom-search-btn" style="padding: 8px 12px;">Buscar</button>
+        </div>
+
+        <div class="filter-container">
+            <div class="filter-label">Filtrar por:</div>
+            <div class="filter-buttons">
+                <button class="filter-button active" data-filter="all">Todos</button>
+                <button class="filter-button" data-filter="ficción">Ficción</button>
+                <button class="filter-button" data-filter="filosofía">Filosofía</button>
+                <button class="filter-button" data-filter="autoayuda">Autoayuda</button>
+                <button class="filter-button" data-filter="romance">Romance</button>
+                <button class="filter-button" data-filter="fantasía">Fantasía</button>
+            </div>
+        </div>
+
+        <div class="products-container">
+            <!-- Libros se cargarán dinámicamente aquí -->
+        </div>
+    </section>
+
+    <!-- Script para barra de búsqueda del header -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.querySelector('.products-container');
+            let libros = [];
+
+            try {
+                const res = await fetch('/libros');
+                libros = await res.json();
+                const params = new URLSearchParams(window.location.search);
+                const termino = params.get('buscar')?.toLowerCase() || null;
+
+                if (termino) {
+                    const filtrados = libros.filter(libro =>
+                        libro.titulo.toLowerCase().includes(termino) ||
+                        libro.autor.toLowerCase().includes(termino)
+                    );
+                    renderBooks(filtrados);
+                } else {
+                    renderBooks(libros);
+                }
+
+            } catch (err) {
+                console.error('Error al cargar libros:', err);
+                container.innerHTML = '<p>Error al cargar el catálogo.</p>';
+            }
+
+            function renderBooks(data) {
+                container.innerHTML = '';
+                data.forEach(libro => {
+                    const item = document.createElement('article');
+                    item.classList.add('product-item');
+                    item.setAttribute('data-category', libro.categoria?.toLowerCase() || 'otros');
+
+                    item.innerHTML = `
+            <div class="product-img">
+              <img src="${libro.imagen}" alt="${libro.titulo}">
+            </div>
+            <div class="product-info">
+              <h3>${libro.titulo}</h3>
+              <p>${libro.autor}</p>
+            </div>
+            <div class="product-actions">
+              <a href="Detalle.html?id=${libro.id}" class="action-button detail-button">Ver detalle</a>
+              <a href="#" class="action-button cart-button" data-id="${libro.id}">Añadir al carrito</a>
+            </div>`;
+                    container.appendChild(item);
+                });
+            }
+
+            // Búsqueda personalizada en barra secundaria
+            const input = document.getElementById('custom-search');
+            const btn = document.getElementById('custom-search-btn');
+
+            btn.addEventListener('click', () => {
+                const query = input.value.trim().toLowerCase();
+                if (query === '') {
+                    renderBooks(libros);
+                    return;
+                }
+
+                const filtrados = libros.filter(libro =>
+                    libro.titulo.toLowerCase().includes(query) ||
+                    libro.autor.toLowerCase().includes(query)
+                );
+                renderBooks(filtrados);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+
+            // Filtros por categoría
+            const filterButtons = document.querySelectorAll('.filter-button');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.getAttribute('data-filter').toLowerCase();
+                    const items = document.querySelectorAll('.product-item');
+
+                    items.forEach(item => {
+                        const category = item.getAttribute('data-category').toLowerCase();
+                        item.style.display = (filter === 'all' || category === filter) ? 'block' : 'none';
+                    });
+                });
+            });
+
+            // Agregar al carrito
+            document.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('cart-button')) {
+                    e.preventDefault();
+                    const libroId = e.target.dataset.id;
+                    let usuarioId = null;
+                    const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+                    if (sessionData) {
+                        try {
+                            const session = JSON.parse(sessionData);
+                            usuarioId = session.user?.id;
+                        } catch (e) {
+                            console.error('Sesión inválida:', e);
+                        }
+                    }
+
+                    if (!usuarioId) {
+                        alert('Debes iniciar sesión para añadir al carrito');
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch('/carrito', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ usuario_id: usuarioId, libro_id: libroId, cantidad: 1 })
+                        });
+
+                        const data = await res.json();
+                        alert(data.message);
+                    } catch (err) {
+                        console.error('Error al añadir al carrito:', err);
+                        alert('Error al añadir al carrito');
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const input = document.getElementById('busqueda');
+                    const query = input.value.trim();
+                    if (query) {
+                        window.location.href = `Tienda.html?buscar=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
