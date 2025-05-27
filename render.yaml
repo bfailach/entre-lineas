@@ -1,0 +1,12 @@
+# Exported from Render on 2025-05-27T06:07:48Z
+services:
+- type: web
+  name: entre-lineas
+  runtime: node
+  repo: https://github.com/bfailach/entre-lineas
+  plan: free
+  region: oregon
+  buildCommand: yarn
+  startCommand: yarn start
+  autoDeployTrigger: commit
+version: "1"
