@@ -93,43 +93,6 @@
     </style>
 </head>
 <!-- SDK de Mercado Pago -->
-<script src="https://sdk.mercadopago.com/js/v2"></script>
-
-<script>
-  const mp = new MercadoPago('APP_USR-cbfdc672-3c44-4846-8744-2a189e24e42d');
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const btnPagar = document.getElementById('btn-finalizar');
-
-    if (btnPagar) {
-      btnPagar.addEventListener('click', async () => {
-        const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
-        if (!sessionData) return alert('Debes iniciar sesión');
-
-        const session = JSON.parse(sessionData);
-        const usuario_id = session.user?.id;
-
-        try {
-          const res = await fetch('/crear-preferencia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario_id })
-          });
-
-          const data = await res.json();
-
-          if (!data.id) throw new Error('Preferencia no generada');
-          mp.checkout({ preference: { id: data.id }, autoOpen: true });
-
-        } catch (err) {
-          console.error('Error al iniciar pago:', err);
-          alert('No se pudo iniciar el pago');
-        }
-      });
-    }
-  });
-</script>
-
 <body>
     <header class="top-header">
         <div class="top-links">
