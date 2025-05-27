@@ -115,6 +115,7 @@
             </form>
         </div>
         <script>
+            const API_BASE = 'https://entre-lineas-d77c.onrender.com';
             document.getElementById('register-form').addEventListener('submit', async function (event) {
                 event.preventDefault();
 
@@ -151,7 +152,7 @@
                     }
 
                     // Enviar datos
-                    const response = await fetch('http://localhost:5000/registrar', {
+                    const response = await fetch(`${API_BASE}/registrar`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
