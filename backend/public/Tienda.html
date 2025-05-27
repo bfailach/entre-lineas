@@ -213,8 +213,15 @@
 });
 
 
-                        const data = await res.json();
-                        alert(data.message);
+                       const data = await res.json();
+if (data.message) {
+  alert(data.message);
+} else if (data.error) {
+  alert(data.error);
+} else {
+  alert('Producto añadido al carrito');
+}
+
                     } catch (err) {
                         console.error('Error al añadir al carrito:', err);
                         alert('Error al añadir al carrito');
