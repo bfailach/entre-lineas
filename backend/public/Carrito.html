@@ -151,6 +151,8 @@
     <script>
         let usuarioId = null;
 
+        const API_BASE = 'https://entre-lineas-d77c.onrender.com';
+
         document.addEventListener('DOMContentLoaded', async () => {
             const sessionData = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
             if (sessionData) {
@@ -172,7 +174,7 @@
 
         async function cargarCarrito() {
             try {
-                const res = await fetch(`/carrito/${usuarioId}`);
+                const res = await fetch(`${API_BASE}/carrito/${usuarioId}`);
                 const items = await res.json();
 
                 const cartItems = document.getElementById('cart-items');
@@ -230,7 +232,7 @@
 
         async function eliminarDelCarrito(id) {
             try {
-                const res = await fetch(`/carrito/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API_BASE}/carrito/${id}`, { method: 'DELETE' });
                 const data = await res.json();
                 alert(data.message);
                 await cargarCarrito();
@@ -244,11 +246,11 @@
             if (nuevaCantidad < 1) return eliminarDelCarrito(id);
 
             try {
-                const res = await fetch(`/carrito/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cantidad: nuevaCantidad })
-                });
+                const res = await fetch(`${API_BASE}/carrito/${id}`, {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ cantidad: nuevaCantidad })
+});
                 if (!res.ok) throw new Error('Error al actualizar cantidad');
                 await cargarCarrito();
             } catch (err) {
@@ -261,7 +263,7 @@
             if (!confirm("¿Estás seguro de que quieres vaciar el carrito?")) return;
 
             try {
-                const res = await fetch(`/carrito/usuario/${usuarioId}`, { method: 'DELETE' });
+                const res = await fetch(`${API_BASE}/carrito/usuario/${usuarioId}`, { method: 'DELETE' });
                 const data = await res.json();
                 alert(data.message);
                 await cargarCarrito();
